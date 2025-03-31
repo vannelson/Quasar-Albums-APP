@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="bg-dark text-white">
-    <div class="row">
-      <div class="col-9">
+    <div class="row q-col-gutter-md">
+      <div class="col-12 col-md-9">
         <SongList
           :songs="songStore.songs"
           :current-page="songStore.currentPage"
@@ -12,7 +12,7 @@
         />
       </div>
 
-      <div class="col-3">
+      <div class="col-12 col-md-3">
         <AudioPlayer />
       </div>
     </div>

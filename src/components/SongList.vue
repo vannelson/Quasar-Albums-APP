@@ -25,7 +25,7 @@
             <q-card-section class="song-info">
               <div class="text-subtitle1 text-bold">{{ song.title }}</div>
               <div class="text-subtitle2 text-grey">{{ song.artist }}</div>
-              <span class="text-grey like-count">{{ song.reactions_count }} Likes</span>
+              <span class="text-grey like-count">{{ song.reactions_count }} Star</span>
             </q-card-section>
           </div>
           <q-btn
@@ -147,5 +147,9 @@ onMounted(async () => {
   position: absolute;
   bottom: 8px;
   right: 8px;
+}
+.song-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
 }
 </style>

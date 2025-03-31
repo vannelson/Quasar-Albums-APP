@@ -21,7 +21,7 @@ export const useSongStore = defineStore('song', {
   actions: {
     async fetchSongs(page = 1) {
       try {
-        const { data } = await api.get(`/songs?page=${page}&limit=10`);
+        const { data } = await api.get(`/songs?page=${page}&limit=8`);
         this.songs = data.data || [];
         this.currentPage = data.meta.current_page || 1;
         this.lastPage = data.meta.last_page || 1;
