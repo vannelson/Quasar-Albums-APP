@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import api from '../src/services/api'; // ✅ Import the base Axios instance
+import api from '../src/services/api';
 
 export interface Song {
   id: number;

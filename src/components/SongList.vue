@@ -1,14 +1,18 @@
 <template>
   <div>
-    <q-toolbar class="justify-end">
-      <q-btn
-        icon="chevron_left"
-        label="Previous"
-        class="q-mr-md"
-        :disable="isFirstPage"
-        @click="prevPage"
-      />
-      <q-btn icon="chevron_right" label="Next" z :disable="isLastPage" @click="nextPage" />
+    <q-toolbar class="justify-between">
+      <div class="text-h5 text-bold">Trending Songs</div>
+
+      <div>
+        <q-btn
+          icon="chevron_left"
+          label="Previous"
+          class="q-mr-md"
+          :disable="isFirstPage"
+          @click="prevPage"
+        />
+        <q-btn icon="chevron_right" label="Next" :disable="isLastPage" @click="nextPage" />
+      </div>
     </q-toolbar>
 
     <div class="song-list">
