@@ -3,14 +3,24 @@
     <q-toolbar class="justify-between">
       <div class="text-h5 text-bold">Trending Songs</div>
       <div>
-        <q-btn icon="chevron_left" label="Previous" class="q-mr-md" :disable="isFirstPage" @click="prevPage" />
+        <q-btn
+          icon="chevron_left"
+          label="Previous"
+          class="q-mr-md"
+          :disable="isFirstPage"
+          @click="prevPage"
+        />
         <q-btn icon="chevron_right" label="Next" :disable="isLastPage" @click="nextPage" />
       </div>
     </q-toolbar>
 
     <div class="song-list">
-      <q-card v-for="(song, index) in songStore.songs" :key="song.id" class="song-card relative-position"
-        @dblclick="handleDoubleClick(song)">
+      <q-card
+        v-for="(song, index) in songStore.songs"
+        :key="song.id"
+        class="song-card relative-position"
+        @dblclick="handleDoubleClick(song)"
+      >
         <div class="song-bg-image" :style="backgroundImageStyle(index)"></div>
         <div class="song-content row no-wrap items-center">
           <div class="col">
@@ -18,13 +28,17 @@
             <q-card-section class="song-info">
               <div class="text-subtitle1 text-bold">{{ song.title }}</div>
               <div class="text-subtitle2 text-grey">{{ song.artist }}</div>
-              <span class="text-grey like-count">
-                {{ song.reactions_count }} Star
-              </span>
+              <span class="text-grey like-count"> {{ song.reactions_count }} Star </span>
             </q-card-section>
           </div>
-          <q-btn flat round :icon="song.is_liked ? 'star' : 'star_border'" class="like-btn" color="yellow"
-            @click="toggleLike(song)" />
+          <q-btn
+            flat
+            round
+            :icon="song.is_liked ? 'star' : 'star_border'"
+            class="like-btn"
+            color="yellow"
+            @click="toggleLike(song)"
+          />
         </div>
       </q-card>
     </div>
@@ -37,7 +51,6 @@ import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 import { useSongStore } from '../stores/songs';
 
-// Define event emission with `defineEmits`
 const emit = defineEmits<{
   (event: 'song-double-clicked', song: Song): void;
 }>();
@@ -59,8 +72,7 @@ const nextPage = async (): Promise<void> => {
   }
 };
 
-const songRank = (index: number): number =>
-  (songStore.currentPage - 1) * 8 + index + 1;
+const songRank = (index: number): number => (songStore.currentPage - 1) * 8 + index + 1;
 
 const backgroundImageStyle = (index: number): Record<string, string> => ({
   backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 40%), url(https://picsum.photos/100/200${index})`,
@@ -86,7 +98,6 @@ const toggleLike = async (song: Song): Promise<void> => {
   if (songIndex !== -1) {
     const newLikedStatus = !song.is_liked;
     const newReactionCount = song.reactions_count + (newLikedStatus ? 1 : -1);
-    // Optimistically update the UI.
     songStore.songs[songIndex] = {
       ...song,
       is_liked: newLikedStatus,
@@ -96,14 +107,11 @@ const toggleLike = async (song: Song): Promise<void> => {
   }
 };
 
-// Handle the double-click event and emit it to the parent component
 const handleDoubleClick = (song: Song) => {
   emit('song-double-clicked', song);
 };
 
-onMounted(async () => {
-
-  // Emit an event so that all connected clients know a reaction was updated.
+onMounted(() => {
   if (socket && socket.connected) {
     songStore.songs.forEach((song) => {
       if (socket) {
@@ -118,7 +126,6 @@ onMounted(async () => {
   }
 });
 
-// Define the type for the payload received from the socket.
 interface ReactionPayload {
   reaction: {
     song_id: number;
@@ -129,25 +136,20 @@ interface ReactionPayload {
 onMounted(async (): Promise<void> => {
   await songStore.fetchSongs();
 
-  // Initialize a direct Socket.IO connection.
   socket = io('http://localhost:6001', {
     transports: ['websocket', 'polling'],
   });
 
   socket.on('connect', () => {
     console.log('Socket connected:', socket?.id);
-    // Emit a subscribe event if your server uses one.
     socket?.emit('subscribe', { channel: 'laravel_database_song-reactions' });
   });
 
-  // Listen for the reaction event.
   socket.on('reaction.updated', (payload: ReactionPayload) => {
     console.log('Received reaction.updated via socket:', payload);
-    // For this example, simply refetch the current page.
     void songStore.fetchSongs(songStore.currentPage);
   });
 
-  // Log any event for debugging.
   socket.onAny((event: string, ...args: unknown[]): void => {
     console.log('Socket event:', event, args);
   });
@@ -156,7 +158,6 @@ onMounted(async (): Promise<void> => {
     console.error('Socket error:', err);
   });
 
-  // Fallback: Poll the server every 10 seconds.
   pollingInterval = setInterval(() => {
     console.log('Polling for song updates...');
     void songStore.fetchSongs(songStore.currentPage);
@@ -226,7 +227,6 @@ onUnmounted((): void => {
   bottom: 8px;
   right: 8px;
 }
-
 
 .song-card:hover {
   transform: scale(1.05);
