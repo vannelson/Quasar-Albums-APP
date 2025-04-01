@@ -7,6 +7,7 @@ export interface Song {
   artist: string;
   reactions_count: number;
   is_liked: boolean;
+  url?: string;
   album?: {
     cover: string;
   };

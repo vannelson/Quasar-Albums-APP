@@ -19,19 +19,14 @@
     </q-card-section>
   </q-card>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
+import { useSongStore } from '../stores/songs';
 import type { YTPlayer, YTPlayerEvent, YTPlayerOptions } from '../types/youtube';
 
-const videos = ref([
-  { title: 'Song 1', votes: 120, youtubeId: 'dQw4w9WgXcQ' },
-  { title: 'Song 2', votes: 150, youtubeId: 'oHg5SJYRHA0' },
-  { title: 'Song 3', votes: 90, youtubeId: '3JZ_D3ELwOQ' },
-]);
-
+const songStore = useSongStore();
 const currentIndex = ref(0);
-const currentSong = computed(() => videos.value[currentIndex.value]);
+const currentSong = computed(() => songStore.songs[currentIndex.value] || null);
 const isPlaying = ref(false);
 
 let player: YTPlayer | null = null;
@@ -47,12 +42,25 @@ const loadYouTubePlayer = () => {
   }
 };
 
+onMounted(async () => {
+  await songStore.fetchSongs();
+  loadYouTubePlayer();
+
+  songStore.songs.forEach((song) => {
+    const youtubeUrl = `https://www.youtube.com/watch?v=${song.url}`;
+    console.log(youtubeUrl, `(${song.title} - ${song.artist})`);
+  });
+});
+
+// Create YouTube Player
 const createPlayer = () => {
+  if (!currentSong.value?.url) return;
+  console.log(currentSong);
   const options: YTPlayerOptions = {
     height: '200',
     width: '100%',
-    videoId: currentSong.value?.youtubeId || '',
-    playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0 },
+    videoId: currentSong.value.url,
+    playerVars: { autoplay: 1, controls: 1, modestbranding: 1, rel: 0 },
     events: {
       onReady: (event: YTPlayerEvent) => {
         event.target.playVideo();
@@ -69,28 +77,32 @@ const createPlayer = () => {
 
 const togglePlayPause = () => {
   if (!player) return;
+
   if (isPlaying.value) {
     player.pauseVideo();
   } else {
     player.playVideo();
   }
+
   isPlaying.value = !isPlaying.value;
 };
 
 const stopVideo = () => {
-  if (player) {
-    player.stopVideo();
-    isPlaying.value = false;
-  }
+  player?.stopVideo();
+  isPlaying.value = false;
 };
 
 const nextVideo = () => {
-  currentIndex.value = (currentIndex.value + 1) % videos.value.length;
-  player?.loadVideoById(currentSong.value?.youtubeId || '');
+  if (songStore.songs.length === 0) return;
+  currentIndex.value = (currentIndex.value + 1) % songStore.songs.length;
+  player?.loadVideoById(currentSong.value?.url || '');
   isPlaying.value = true;
 };
 
-onMounted(loadYouTubePlayer);
+onMounted(async () => {
+  await songStore.fetchSongs();
+  loadYouTubePlayer();
+});
 </script>
 
 <style scoped>
