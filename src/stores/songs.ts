@@ -18,6 +18,7 @@ export const useSongStore = defineStore('song', {
     songs: [] as Song[],
     currentPage: 1,
     lastPage: 1,
+    playingSong: null as Song | null,
   }),
   actions: {
     async fetchSongs(page = 1) {
@@ -26,6 +27,7 @@ export const useSongStore = defineStore('song', {
         this.songs = data.data || [];
         this.currentPage = data.meta.current_page || 1;
         this.lastPage = data.meta.last_page || 1;
+        this.playingSong = data.data.at(0);
       } catch (error) {
         console.error('Error fetching songs', error);
       }
@@ -40,6 +42,9 @@ export const useSongStore = defineStore('song', {
       } catch (error) {
         console.error('Error toggling like:', error);
       }
+    },
+    setPlayingSong(song: Song) {
+      this.playingSong = song;
     },
   },
 });

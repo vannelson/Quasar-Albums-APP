@@ -20,6 +20,7 @@
         v-for="(song, index) in songStore.songs"
         :key="song.id"
         class="song-card relative-position"
+        @dblclick="handleDoubleClick(song)"
       >
         <div class="song-bg-image" :style="backgroundImageStyle(index)"></div>
 
@@ -49,6 +50,12 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import { useSongStore } from '../stores/songs';
+
+// Define event emission with `defineEmits`
+const emit = defineEmits<{
+  (event: 'song-double-clicked', song: Song): void;
+}>();
+
 const songStore = useSongStore();
 
 const isFirstPage = computed(() => songStore.currentPage === 1);
@@ -92,6 +99,11 @@ const toggleLike = async (song: Song) => {
     };
     await songStore.toggleSongLike(song.id, newLikedStatus);
   }
+};
+
+// Handle the double-click event and emit it to the parent component
+const handleDoubleClick = (song: Song) => {
+  emit('song-double-clicked', song);
 };
 
 onMounted(async () => {
@@ -152,6 +164,7 @@ onMounted(async () => {
   bottom: 8px;
   right: 8px;
 }
+
 .song-card:hover {
   transform: scale(1.05);
   box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
