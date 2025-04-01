@@ -12,6 +12,12 @@ export interface Song {
   };
 }
 
+// Optional: Define a type for reaction update payload
+export interface SongReactionUpdate {
+  song_id: number;
+  reactions_count: number;
+}
+
 export const useSongStore = defineStore('song', {
   state: () => ({
     songs: [] as Song[],
@@ -40,5 +46,14 @@ export const useSongStore = defineStore('song', {
         console.error('Error toggling like:', error);
       }
     },
+    // New action to update a song's reaction count in real-time.
+    updateSongReaction(updatedReaction: SongReactionUpdate) {
+      const songIndex = this.songs.findIndex((song) => song.id === updatedReaction.song_id);
+      if (songIndex !== -1) {
+        if (songIndex !== -1 && this.songs[songIndex]) {
+          this.songs[songIndex].reactions_count = updatedReaction.reactions_count;
+        }
+      }
+    }
   },
 });
