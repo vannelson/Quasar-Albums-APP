@@ -9,7 +9,8 @@
     </q-toolbar>
 
     <div class="song-list">
-      <q-card v-for="(song, index) in songStore.songs" :key="song.id" class="song-card relative-position">
+      <q-card v-for="(song, index) in songStore.songs" :key="song.id" class="song-card relative-position"
+        @dblclick="handleDoubleClick(song)">
         <div class="song-bg-image" :style="backgroundImageStyle(index)"></div>
         <div class="song-content row no-wrap items-center">
           <div class="col">
@@ -35,6 +36,11 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 import { useSongStore } from '../stores/songs';
+
+// Define event emission with `defineEmits`
+const emit = defineEmits<{
+  (event: 'song-double-clicked', song: Song): void;
+}>();
 
 const songStore = useSongStore();
 
@@ -87,18 +93,30 @@ const toggleLike = async (song: Song): Promise<void> => {
       reactions_count: newReactionCount,
     };
     await songStore.toggleSongLike(song.id, newLikedStatus);
-
-    // Emit an event so that all connected clients know a reaction was updated.
-    if (socket && socket.connected) {
-      socket.emit('reaction.updated', {
-        reaction: {
-          song_id: song.id,
-          reactions_count: newReactionCount,
-        },
-      });
-    }
   }
 };
+
+// Handle the double-click event and emit it to the parent component
+const handleDoubleClick = (song: Song) => {
+  emit('song-double-clicked', song);
+};
+
+onMounted(async () => {
+
+  // Emit an event so that all connected clients know a reaction was updated.
+  if (socket && socket.connected) {
+    songStore.songs.forEach((song) => {
+      if (socket) {
+        socket.emit('reaction.updated', {
+          reaction: {
+            song_id: song.id,
+            reactions_count: song.reactions_count,
+          },
+        });
+      }
+    });
+  }
+});
 
 // Define the type for the payload received from the socket.
 interface ReactionPayload {
@@ -208,6 +226,7 @@ onUnmounted((): void => {
   bottom: 8px;
   right: 8px;
 }
+
 
 .song-card:hover {
   transform: scale(1.05);
