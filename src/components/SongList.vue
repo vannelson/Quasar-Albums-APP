@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-toolbar class="justify-between">
-      <div class="text-h5 text-bold">Trending Songs</div>
+      <div class="text-h6 text-bold q-pb-md">Trending Songs</div>
       <div>
         <q-btn
           icon="chevron_left"

@@ -51,12 +51,10 @@ type Song = {
   is_liked: boolean;
 };
 
-// Handle the double-click event
 const handleSongDoubleClick = (song: Song) => {
   songStore.setPlayingSong(song);
 };
 
-// Fetch initial data
 onMounted(async () => {
   await songStore.fetchSongs();
 });
